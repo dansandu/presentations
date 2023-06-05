@@ -56,7 +56,7 @@ def read_the_data_set():
     data = np.array([[float(val) for val in line.strip().split(' ')] for line in f.readlines()]).T
     X = data[0:2,:].reshape(2, -1)
     
-    # synthesize new features x1^2, x1 * x2, x2^2
+    # synthesize the new features x1^2, x1 * x2, x2^2
     # the model will be more complex and fit the data better
     X = np.concatenate((X, X[[0]] ** 2, X[[0]] * X[[1]], X[[1]] ** 2), axis=0)
 
