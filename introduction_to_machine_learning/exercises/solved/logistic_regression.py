@@ -67,17 +67,17 @@ def read_the_data_set():
   return (X, Y)
 
 
-def draw_boundry(W, b, X1, X2, axs, boundary_graph, samples):
+def draw_boundry(W, b, boundary_X, axs, boundary_graph, samples):
   Z = np.zeros((samples, samples))
   for i in range(samples):
     for j in range(samples):
-      x1, x2 = X1[i], X2[j]
-      X  = np.array([x1, x2]).reshape(-1, 1)
+      x1, x2 = boundary_X[0,i], boundary_X[0,j]
+      X = np.array([x1, x2]).reshape(-1, 1)
       Z[i,j] = evaluate_model_without_activation(W, b, X)
   if boundary_graph != None:
     for tp in boundary_graph.collections:
       tp.remove()
-  boundary_graph = axs[0].contour(X1, X2, Z, levels=[0], colors='blue')
+  boundary_graph = axs[0].contour(boundary_X[0,:], boundary_X[1,:], Z, levels=[0], colors='blue')
   return boundary_graph
 
 
@@ -91,15 +91,18 @@ def draw_loss(iteration, loss, iterations_axis, losses_axis, axs, loss_graph):
 
 
 def initialize_graphs(W, b, X, Y, boundry_samples):
-  min_x = np.amin(X, axis=1, keepdims=True)
-  max_x = np.amax(X, axis=1, keepdims=True)
-  padding = 0.05 * (max_x - min_x)
+  min_x = np.amin(X, axis=1)
+  max_x = np.amax(X, axis=1)
+  
+  padding = 0.1
+  min_x_padded = min_x * (1 - padding)
+  max_x_padded = max_x * (1 + padding)
 
   plt.ion()
   fig, axs = plt.subplots(1, 2)
 
-  axs[0].set_xlim((min_x[0][0] - padding[0][0], max_x[0][0] + padding[0][0]))
-  axs[0].set_ylim((min_x[1][0] - padding[1][0], max_x[1][0] + padding[1][0]))
+  axs[0].set_xlim((min_x_padded[0], max_x_padded[0]))
+  axs[0].set_ylim((min_x_padded[1], max_x_padded[1]))
   axs[0].scatter(X[0,Y[0]==1], X[1,Y[0]==1], marker='x', color='red', linewidth=1)
   axs[0].scatter(X[0,Y[0]==0], X[1,Y[0]==0], marker='o', color='green', fc='none', ec='green', linewidth=1, s=60)
   axs[0].set_title('Malicious process detection')
@@ -110,12 +113,11 @@ def initialize_graphs(W, b, X, Y, boundry_samples):
   axs[1].set_xlabel('Iterations')
   axs[1].set_ylabel('Loss')
 
-  boundary_X1 = np.linspace(min_x[0][0] - padding[0][0], max_x[0][0] + padding[0][0], boundry_samples)
-  boundary_X2 = np.linspace(min_x[1][0] - padding[1][0], max_x[0][0] + padding[1][0], boundry_samples)
+  boundary_X = np.linspace(min_x_padded, max_x_padded, boundry_samples).T
 
-  boundary_graph = draw_boundry(W, b, boundary_X1, boundary_X2, axs, None, boundry_samples)
+  boundary_graph = draw_boundry(W, b, boundary_X, axs, None, boundry_samples)
 
-  return fig, axs, boundary_graph, loss_graph, boundary_X1, boundary_X2
+  return fig, axs, boundary_graph, loss_graph, boundary_X
 
 
 def normalize(X):
@@ -125,8 +127,7 @@ def normalize(X):
 
 
 def run_gradient_descent(X, Y, initial_W, initial_b, learning_rate, iterations):
-
-  # fixes exploding gradient problems and speeds up learning
+  # fixes the exploding gradient problem and speeds up learning
   Xn = normalize(X)
 
   W = initial_W
@@ -136,7 +137,7 @@ def run_gradient_descent(X, Y, initial_W, initial_b, learning_rate, iterations):
   iterations_axis = []
 
   boundry_samples = 50
-  fig, axs, boundary_graph, loss_graph, boundary_X1, boundary_X2 = initialize_graphs(W, b, Xn, Y, boundry_samples)
+  fig, axs, boundary_graph, loss_graph, boundary_X = initialize_graphs(W, b, Xn, Y, boundry_samples)
 
   for iteration in range(iterations):
     loss = calculate_loss(W, b, Xn, Y)
@@ -145,8 +146,9 @@ def run_gradient_descent(X, Y, initial_W, initial_b, learning_rate, iterations):
     W = W - learning_rate * derror_dw
     b = b - learning_rate * derror_db
 
+    # update the graphs every 10 iterations
     if iteration % 10 == 0:
-      boundary_graph = draw_boundry(W, b, boundary_X1, boundary_X2, axs, boundary_graph, boundry_samples)
+      boundary_graph = draw_boundry(W, b, boundary_X, axs, boundary_graph, boundry_samples)
 
       draw_loss(iteration, loss, iterations_axis, losses_axis, axs, loss_graph)
 

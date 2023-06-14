@@ -65,8 +65,8 @@ def initialize_graphs(w, b, X, Y):
 
   plt.ion()
   fig, axs = plt.subplots(1, 2)
-  model_x_axis = np.array([min_x - padding, max_x + padding])
-  model_graph, = axs[0].plot(model_x_axis, evaluate_model(w, b, model_x_axis), color='blue')
+  boundary_X = np.array([min_x - padding, max_x + padding])
+  boundary_graph, = axs[0].plot(boundary_X, evaluate_model(w, b, boundary_X), color='blue')
   axs[0].set_xlim((min_x - padding, max_x + padding))
   axs[0].set_ylim((min_y - padding, max_y + padding))
   axs[0].scatter(X, Y, marker='x', color='red', linewidth=1)
@@ -78,7 +78,7 @@ def initialize_graphs(w, b, X, Y):
   axs[1].set_xlabel('Iterations')
   axs[1].set_ylabel('Loss')
   
-  return fig, axs, model_graph, loss_graph, model_x_axis
+  return fig, axs, boundary_graph, loss_graph, boundary_X
 
 
 def run_gradient_descent(X, Y, initial_w, initial_b, learning_rate, iterations):
@@ -88,7 +88,7 @@ def run_gradient_descent(X, Y, initial_w, initial_b, learning_rate, iterations):
   losses_axis = []
   iterations_axis = []
 
-  fig, axs, model_graph, loss_graph, model_x_axis = initialize_graphs(w, b, X, Y)
+  fig, axs, boundary_graph, loss_graph, boundary_X = initialize_graphs(w, b, X, Y)
 
   for i in range(iterations):
     loss = calculate_loss(w, b, X, Y)
@@ -97,8 +97,9 @@ def run_gradient_descent(X, Y, initial_w, initial_b, learning_rate, iterations):
     w = w - learning_rate * derror_dw
     b = b - learning_rate * derror_db
 
+    # update the graphs every 200 iterations
     if i % 200 == 0:
-      model_graph.set_ydata(evaluate_model(w, b, model_x_axis))
+      boundary_graph.set_ydata(evaluate_model(w, b, boundary_X))
 
       iterations_axis.append(i + 1)
       losses_axis.append(loss)
