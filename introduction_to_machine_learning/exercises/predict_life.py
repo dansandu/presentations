@@ -4,9 +4,9 @@ from matplotlib.widgets import Slider
 
 
 with open('../data/exercise_life.txt', 'r') as f:
-    lines =[line.strip().split(' ') for line in f.readlines()]
-    X = np.array([float(line[0]) for line in lines]).reshape(-1, 1)
-    Y = np.array([float(line[1]) for line in lines]).reshape(-1, 1)
+  lines =[line.strip().split(' ') for line in f.readlines()]
+  X = np.array([float(line[0]) for line in lines]).reshape(-1, 1)
+  Y = np.array([float(line[1]) for line in lines]).reshape(-1, 1)
 
 
 min_x = np.amin(X)
@@ -33,7 +33,7 @@ init_w = (max_y - min_y) / (max_x - min_x)
 init_b = init_w * - min_x + min_y
 
 def f(w, b, X):
-    return w * X + b
+  return w * X + b
 
 x_space = np.linspace(min_x - padding, max_x + padding, 10)
 
@@ -65,8 +65,8 @@ b_slider = Slider(
 )
 
 def on_slider_changed(val): 
-    model.set_ydata(f(w_slider.val, b_slider.val, x_space))
-    fig.canvas.draw_idle()
+  model.set_ydata(f(w_slider.val, b_slider.val, x_space))
+  fig.canvas.draw_idle()
 
 w_slider.on_changed(on_slider_changed)
 b_slider.on_changed(on_slider_changed)

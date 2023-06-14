@@ -5,9 +5,9 @@ from matplotlib import ticker
 
 
 with open('../data/exercise_life.txt', 'r') as f:
-    lines =[line.strip().split(' ') for line in f.readlines()]
-    X = np.array([float(line[0]) for line in lines]).reshape(-1, 1)
-    Y = np.array([float(line[1]) for line in lines]).reshape(-1, 1)
+  lines =[line.strip().split(' ') for line in f.readlines()]
+  X = np.array([float(line[0]) for line in lines]).reshape(-1, 1)
+  Y = np.array([float(line[1]) for line in lines]).reshape(-1, 1)
 
 min_x = np.amin(X)
 max_x = np.amax(X)
@@ -32,7 +32,7 @@ init_w = (max_y - min_y) / (max_x - min_x)
 init_b = init_w * - min_x + min_y
 
 def f(w, b, X):
-    return w * X + b
+  return w * X + b
 
 
 x_space = np.linspace(min_x - padding, max_x + padding, 10)
@@ -40,7 +40,7 @@ x_space = np.linspace(min_x - padding, max_x + padding, 10)
 model, = axs[0].plot(x_space, f(init_w, init_b, x_space), color='blue')
 
 def loss(w, b, X, Y):
-    return np.mean((f(w, b, X) - Y) ** 2) / 2.0
+  return np.mean((f(w, b, X) - Y) ** 2) / 2.0
 
 w_space_center = 0.0
 w_space_radius = 4.0
@@ -81,10 +81,10 @@ b_slider = Slider(
 )
 
 def on_slider_changed(val): 
-    model.set_ydata(f(w_slider.val, b_slider.val, x_space))
-    cursor.set_xdata([w_slider.val])
-    cursor.set_ydata([b_slider.val])
-    fig.canvas.draw_idle()
+  model.set_ydata(f(w_slider.val, b_slider.val, x_space))
+  cursor.set_xdata([w_slider.val])
+  cursor.set_ydata([b_slider.val])
+  fig.canvas.draw_idle()
 
 w_slider.on_changed(on_slider_changed)
 b_slider.on_changed(on_slider_changed)
