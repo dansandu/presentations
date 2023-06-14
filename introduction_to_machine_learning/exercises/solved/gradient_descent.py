@@ -15,7 +15,8 @@ import numpy as np
 # returns the predicted life expectancy for all samples in X, np.narray (1, m)
 def evaluate_model(w, b, X):
   # YOUR CODE HERE #
-  return w * X + b
+  Z = w * X + b
+  return Z
 
 
 # The loss function evaluates how well the model is performing.
@@ -26,7 +27,10 @@ def evaluate_model(w, b, X):
 # returns the total loss with regard to all samples, float
 def calculate_loss(w, b, X, Y):
   # YOUR CODE HERE #
-  return 0.5 * np.mean((evaluate_model(w, b, X) - Y) ** 2)
+  Y_hat = evaluate_model(w, b, X)
+  error = Y_hat - Y
+  loss = 0.5 * np.mean(error ** 2)
+  return loss
 
 
 # The gradient of the loss function.
@@ -37,9 +41,12 @@ def calculate_loss(w, b, X, Y):
 # returns the gradient of the loss function with respect to w and b over all samples, tuple (float, float)
 def calculate_gradient(w, b, X, Y):
   # YOUR CODE HERE #
-  error = evaluate_model(w, b, X) - Y
   m = X.shape[1]
-  return error @ X.T / m, np.mean(error)
+  Y_hat = evaluate_model(w, b, X)
+  error = Y_hat - Y
+  dloss_dw = error @ X.T / m
+  dloss_db = np.mean(error)
+  return dloss_dw, dloss_db
 
 
 ##############################################################################
@@ -93,9 +100,9 @@ def run_gradient_descent(X, Y, initial_w, initial_b, learning_rate, iterations):
   for i in range(iterations):
     loss = calculate_loss(w, b, X, Y)
 
-    derror_dw, derror_db = calculate_gradient(w, b, X, Y)
-    w = w - learning_rate * derror_dw
-    b = b - learning_rate * derror_db
+    dloss_dw, dloss_db = calculate_gradient(w, b, X, Y)
+    w = w - learning_rate * dloss_dw
+    b = b - learning_rate * dloss_db
 
     # update the graphs every 200 iterations
     if i % 200 == 0:

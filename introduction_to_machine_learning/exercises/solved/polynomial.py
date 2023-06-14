@@ -20,7 +20,8 @@ def sigmoid(Z):
 # returns the position of each sample relative to the decision boundary, np.narray (1, m)
 def evaluate_model_without_activation(W, b, X):
   # YOUR CODE HERE #
-  return W @ X + b
+  Z = W @ X + b
+  return Z
 
 
 # The loss function evaluates how well the model is performing.
@@ -31,8 +32,9 @@ def evaluate_model_without_activation(W, b, X):
 # returns the total loss with regard to all samples, float
 def calculate_loss(W, b, X, Y):
   # YOUR CODE HERE #
-  A = sigmoid(evaluate_model_without_activation(W, b, X))
-  return -np.mean(Y * np.log(A) + (1 - Y) * np.log(1 - A))
+  Y_hat = sigmoid(evaluate_model_without_activation(W, b, X))
+  loss = -np.mean(Y * np.log(Y_hat) + (1 - Y) * np.log(1 - Y_hat))
+  return loss
 
 
 # The gradient of the loss function.
@@ -43,9 +45,12 @@ def calculate_loss(W, b, X, Y):
 # returns the gradient of the loss function with respect to W and b over all samples, tuple (np.narray (1, 5), float)
 def calculate_gradient(W, b, X, Y):
   # YOUR CODE HERE
-  error = sigmoid(evaluate_model_without_activation(W, b, X)) - Y
   m = X.shape[1]
-  return error @ X.T / m, np.mean(error)
+  Y_hat = sigmoid(evaluate_model_without_activation(W, b, X))
+  error = Y_hat - Y
+  dloss_dW = error @ X.T / m
+  dloss_db = np.mean(error)
+  return dloss_dW, dloss_db
 
 
 ##############################################################################
@@ -142,9 +147,9 @@ def run_gradient_descent(X, Y, initial_W, initial_b, learning_rate, iterations):
   for iteration in range(iterations):
     loss = calculate_loss(W, b, Xn, Y)
 
-    derror_dw, derror_db = calculate_gradient(W, b, Xn, Y)
-    W = W - learning_rate * derror_dw
-    b = b - learning_rate * derror_db
+    dloss_dW, dloss_db = calculate_gradient(W, b, Xn, Y)
+    W = W - learning_rate * dloss_dW
+    b = b - learning_rate * dloss_db
 
     # update the graphs every 1000 iterations
     if iteration % 1000 == 0:

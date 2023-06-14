@@ -139,9 +139,9 @@ def run_gradient_descent(X, Y, initial_W, initial_b, learning_rate, iterations):
   for iteration in range(iterations):
     loss = calculate_loss(W, b, Xn, Y)
 
-    derror_dw, derror_db = calculate_gradient(W, b, Xn, Y)
-    W = W - learning_rate * derror_dw
-    b = b - learning_rate * derror_db
+    dloss_dW, dloss_db = calculate_gradient(W, b, Xn, Y)
+    W = W - learning_rate * dloss_dW
+    b = b - learning_rate * dloss_db
 
     # update the graphs every 10 iterations
     if iteration % 10 == 0:
