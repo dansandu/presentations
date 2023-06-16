@@ -10,9 +10,9 @@ import numpy as np
 
 # The evaluation of the model but WITHOUT the sigmoid activation function.
 # Primarily used to draw the decision boundary of the model.
-# W: the features parameters, np.narray (1, 5)
+# W: the features parameters, np.narray (1, 2)
 # b: the bias of the model, float
-# X: the feature set for disk activity, np.narray (5, m)
+# X: the feature set for disk activity, np.narray (2, m)
 # returns the position of each sample relative to the decision boundary, np.narray (1, m)
 def evaluate_model_without_activation(W, b, X):
   # YOUR CODE HERE #
@@ -30,9 +30,9 @@ def sigmoid(Z):
 
 
 # The loss function evaluates how well the model is performing.
-# W: the features parameters, np.narray (1, 5)
+# W: the features parameters, np.narray (1, 2)
 # b: the bias of the model, float
-# X: the feature set for disk activity, np.narray (5, m)
+# X: the feature set for disk activity, np.narray (2, m)
 # Y: the ground truth whether the process is malicious or not, np.narray (1, m)
 # returns the total loss with regard to all samples, float
 def calculate_loss(W, b, X, Y):
@@ -43,11 +43,11 @@ def calculate_loss(W, b, X, Y):
 
 
 # The gradient of the loss function.
-# W: the features parameters, np.narray (1, 5)
+# W: the features parameters, np.narray (1, 2)
 # b: the bias of the model, float
-# X: the feature set for disk activity, np.narray (5, m)
+# X: the feature set for disk activity, np.narray (2, m)
 # Y: the ground truth whether the process is malicious or not, np.narray (1, m)
-# returns the gradient of the loss function with respect to W and b over all samples, tuple (np.narray (1, 5), float)
+# returns the gradient of the loss function with respect to W and b over all samples, tuple (np.narray (1, 2), float)
 def calculate_gradient(W, b, X, Y):
   # YOUR CODE HERE
   m = X.shape[1]
