@@ -19,23 +19,20 @@ def evaluate_model(w, b, X):
 
 
 # The loss function evaluates how well the model is performing.
-# w: the slope of the line, float
-# b: the bias of the model, float
-# X: the feature set representing monthly hours spent exercising, np.narray (1, m)
-# Y: the ground truth representing life expectancy, np.narray (1, m)
+# Y_hat: the life expectancy prediction, np.narray (1, m)
+# Y: the life expectancy ground truth, np.narray (1, m)
 # returns the total loss with regard to all samples, float
-def calculate_loss(w, b, X, Y):
+def calculate_loss(Y_hat, Y):
   # YOUR CODE HERE #
   return
 
 
 # The gradient of the loss function.
-# w: the slope of the line, float
-# b: the bias of the model, float
 # X: the feature set representing monthly hours spent exercising, np.narray (1, m)
-# Y: the ground truth representing life expectancy, np.narray (1, m)
+# Y_hat: the life expectancy prediction, np.narray (1, m)
+# Y: the life expectancy ground truth, np.narray (1, m)
 # returns the gradient of the loss function with respect to w and b over all samples, tuple (float, float)
-def calculate_gradient(w, b, X, Y):
+def calculate_gradient(X, Y_hat, Y):
   # YOUR CODE HERE #
   return
 
@@ -89,9 +86,11 @@ def run_gradient_descent(X, Y, initial_w, initial_b, learning_rate, iterations):
   fig, axs, boundary_graph, loss_graph, boundary_X = initialize_graphs(w, b, X, Y)
 
   for i in range(iterations):
-    loss = calculate_loss(w, b, X, Y)
+    Y_hat = evaluate_model(w, b, X)
 
-    dloss_dw, dloss_db = calculate_gradient(w, b, X, Y)
+    loss = calculate_loss(Y_hat, Y)
+
+    dloss_dw, dloss_db = calculate_gradient(X, Y_hat, Y)
     w = w - learning_rate * dloss_dw
     b = b - learning_rate * dloss_db
 
@@ -132,7 +131,7 @@ def run_tests():
 
   # check the loss
   expected_loss = 53838.77654355495
-  actual_loss = calculate_loss(w, b, X, Y)
+  actual_loss = calculate_loss(expected_model, Y)
 
   assert not isinstance(actual_loss, type(None)), "calculate_loss returned None -- make sure to return a value"
 
@@ -140,7 +139,7 @@ def run_tests():
 
   # check the gradient
   expected_gradient = (-22076.36752275032, -310.4904444732006)
-  actual_gradient = calculate_gradient(w, b, X, Y)
+  actual_gradient = calculate_gradient(X, expected_model, Y)
 
   assert isinstance(actual_gradient, tuple), "calculate_gradient should return a tuple"
 
