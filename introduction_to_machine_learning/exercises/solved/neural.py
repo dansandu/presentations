@@ -104,7 +104,7 @@ def backpropagation(Ws, Bs, X, Zs, Y_hat, Y):
 
 ##############################################################################
 # The code below should not be changed prior to completing the exercises.    #
-# After you pass all the tests we encourage you to play with the code below. #
+# After you pass all the tests you can play with the code below.             #
 ##############################################################################
 
 
@@ -239,7 +239,7 @@ if __name__ == '__main__':
   #  np.random.rand(1, 1),
   #]
 
-  # for debugging purposes you don't want random behaviour
+  # for debugging purposes we don't want random behaviour
   Ws = [
     np.array([[0.36, 0.28],
               [0.08, 0.81],

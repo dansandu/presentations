@@ -39,7 +39,7 @@ def calculate_gradient(X, Y_hat, Y):
 
 ##############################################################################
 # The code below should not be changed prior to completing the exercises.    #
-# After you pass all the tests we encourage you to play with the code below. #
+# After you pass all the tests you can play with the code below.             #
 ##############################################################################
 
 
@@ -158,18 +158,18 @@ if __name__ == '__main__':
   # make sure the tests pass before running gradient descent
   run_tests()
 
-  # you can randomly initialize to try different values
+  # we can randomly initialize to try different values
   # w = np.random.rand()
   # b = np.random.rand()
 
-  # for debugging purposes you don't want random behaviour
+  # for debugging purposes we don't want random behaviour
   w = 0.58 
   b = 0.28
 
   # The data is not normalized so make sure the learning rate is low enough
   # otherwise the algorithm will not converge.
   # As a bonus exercise try running the algorithm with the data normalized.
-  # With the data normalized you can increase the learning rate and the
+  # With the data normalized we can increase the learning rate and the
   # algorithm will converge much faster.
   learning_rate = 0.002
 

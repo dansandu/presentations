@@ -2,19 +2,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def sigmoid(Z):
-  return 1.0 / (np.exp(-Z) + 1.0)
-
-
-###########################################################################
-# Implement the evaluate_model_without_activation, calculate_loss and     #
-# calculate_gradient functions such that all tests pass.                  #
-###########################################################################
+############################################################################
+# Implement the evaluate_model_without_activation, sigmoid, calculate_loss #
+# and calculate_gradient functions such that all tests pass.               #
+############################################################################
 
 
 # The evaluation of the model but WITHOUT the sigmoid activation function.
 # Primarily used to draw the decision boundary of the model.
-# W: the features parameters, np.narray (1, 5)
+# W: the weight parameters, np.narray (1, 5)
 # b: the bias of the model, float
 # X: the feature set for disk activity, np.narray (5, m)
 # returns the position of each sample relative to the decision boundary, np.narray (1, m)
@@ -23,31 +19,37 @@ def evaluate_model_without_activation(W, b, X):
   return
 
 
+# The activation function mapping values from R space to (0, 1) giving us the
+# probability whether the process is malicious or not.
+# Z: the position of each sample relative to the decision boundary, np.narray (1, m)
+# returns the probability for each value inside Z, np.narray (1, m)
+def sigmoid(Z):
+  # YOUR CODE HERE #
+  return
+
+
 # The loss function evaluates how well the model is performing.
-# W: the features parameters, np.narray (1, 5)
-# b: the bias of the model, float
-# X: the feature set for disk activity, np.narray (5, m)
+# Y_hat: the prediction whether the process is malicious or not, np.narray (1, m)
 # Y: the ground truth whether the process is malicious or not, np.narray (1, m)
 # returns the total loss with regard to all samples, float
-def calculate_loss(W, b, X, Y):
+def calculate_loss(Y_hat, Y):
   # YOUR CODE HERE #
   return
 
 
 # The gradient of the loss function.
-# W: the features parameters, np.narray (1, 5)
-# b: the bias of the model, float
 # X: the feature set for disk activity, np.narray (5, m)
+# Y_hat: the prediction whether the process is malicious or not, np.narray (1, m)
 # Y: the ground truth whether the process is malicious or not, np.narray (1, m)
 # returns the gradient of the loss function with respect to W and b over all samples, tuple (np.narray (1, 5), float)
-def calculate_gradient(W, b, X, Y):
+def calculate_gradient(X, Y_hat, Y):
   # YOUR CODE HERE
   return
 
 
 ##############################################################################
 # The code below should not be changed prior to completing the exercises.    #
-# After you pass all the tests we encourage you to play with the code below. #
+# After you pass all the tests you can play with the code below.             #
 ##############################################################################
 
 
@@ -137,9 +139,11 @@ def run_gradient_descent(X, Y, initial_W, initial_b, learning_rate, iterations):
   fig, axs, boundary_graph, loss_graph, boundary_X = initialize_graphs(W, b, Xn, Y, boundry_samples)
 
   for iteration in range(iterations):
-    loss = calculate_loss(W, b, Xn, Y)
+    Y_hat = sigmoid(evaluate_model_without_activation(W, b, Xn))
 
-    dloss_dW, dloss_db = calculate_gradient(W, b, Xn, Y)
+    loss = calculate_loss(Y_hat, Y)
+
+    dloss_dW, dloss_db = calculate_gradient(Xn, Y_hat, Y)
     W = W - learning_rate * dloss_dW
     b = b - learning_rate * dloss_db
 
@@ -175,9 +179,11 @@ def run_tests():
 
   assert np.allclose(actual_model_without_activation, expected_model_without_activation), "evaluate_model_without_activation np.darray values are not correct"
   
+  Y_hat = sigmoid(expected_model_without_activation)
+
   # check the loss
   expected_loss = 10.428394650367867
-  actual_loss = calculate_loss(W, b, X, Y)
+  actual_loss = calculate_loss(Y_hat, Y)
 
   assert not isinstance(actual_loss, type(None)), "calculate_loss is returning None -- make sure to return a real value"
 
@@ -185,7 +191,7 @@ def run_tests():
 
   # check the gradient
   expected_gradient = (np.array([[-2.38140404, -1.28678523, -2.90218007, -2.10410844, -2.7372353 ]]), -0.49999838216637127)
-  actual_gradient = calculate_gradient(W, b, X, Y)
+  actual_gradient = calculate_gradient(X, Y_hat, Y)
 
   assert isinstance(actual_gradient, tuple), "calculate_gradient must return a tuple with 2 elements"
 
@@ -206,11 +212,11 @@ if __name__ == '__main__':
   # make sure the tests pass before running gradient descent
   run_tests()
 
-  # you can randomly initialize to try different values
+  # we can randomly initialize to try different values
   # W = np.random.rand(1, X.shape[0])
   # b = np.random.rand()
 
-  # for debugging purposes you don't want random behaviour
+  # for debugging purposes we don't want random behaviour
   W = np.linspace(-1.0, 1.0, X.shape[0]).reshape(1, -1)
   b = 0.28
 
