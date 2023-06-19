@@ -153,10 +153,10 @@ def run_tests():
 
 
 if __name__ == '__main__':
-  X, Y = read_the_data_set()
-
   # make sure the tests pass before running gradient descent
   run_tests()
+
+  X, Y = read_the_data_set()
 
   # we can randomly initialize to try different values
   # w = np.random.rand()

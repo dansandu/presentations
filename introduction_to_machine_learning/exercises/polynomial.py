@@ -168,6 +168,18 @@ def run_tests():
                 [4.47765813, 9.24002417, 4.67822537, 6.72846728, 9.89125599, 3.84542251, 6.24841454, 1.4517947 ]])
   Y = np.array([[1, 1, 0, 1, 0, 0, 0, 1]])
 
+  # check the sigmoid activation function
+  expected_sigmoid = np.array([[0.49289013, 0.72869778, 0.50879759, 0.71480934, 0.66706825],
+                               [0.49285778, 0.72188486, 0.45189955, 0.63578142, 0.69873782]])
+  actual_sigmoid = sigmoid(np.array([[-0.0284414 ,  0.98802567,  0.03519401,  0.91885792,  0.69495487],
+                                     [-0.02857082,  0.95383044, -0.19299864,  0.55710063,  0.84129466]]))
+
+  assert isinstance(actual_sigmoid, np.ndarray), "sigmoid must return a np.darray"
+
+  assert actual_sigmoid.shape == expected_sigmoid.shape, "sigmoid np.darray shape is incorrect"
+
+  assert np.allclose(actual_sigmoid, expected_sigmoid), "sigmoid np.darray values are incorrect"
+
   # check the model without sigmoid activation function
   expected_model_without_activation = np.array([[-21.28774472, -18.07867858, -11.31970587, -20.1938637 , 
                                                  -26.57148799, -29.34923827, -14.04500579, -23.86685725]])
@@ -175,9 +187,9 @@ def run_tests():
 
   assert isinstance(actual_model_without_activation, np.ndarray), "evaluate_model_without_activation must return a np.darray"
 
-  assert actual_model_without_activation.shape == expected_model_without_activation.shape, "evaluate_model_without_activation np.darray shape is not correct"
+  assert actual_model_without_activation.shape == expected_model_without_activation.shape, "evaluate_model_without_activation np.darray shape is incorrect"
 
-  assert np.allclose(actual_model_without_activation, expected_model_without_activation), "evaluate_model_without_activation np.darray values are not correct"
+  assert np.allclose(actual_model_without_activation, expected_model_without_activation), "evaluate_model_without_activation np.darray values are incorrect"
   
   Y_hat = sigmoid(expected_model_without_activation)
 
@@ -199,18 +211,18 @@ def run_tests():
 
   assert actual_gradient[0].shape == expected_gradient[0].shape, "calculate_gradient weights shape is incorrect"
 
-  assert np.allclose(actual_gradient[0], expected_gradient[0]), "calculate_gradient weights values is incorrect"
+  assert np.allclose(actual_gradient[0], expected_gradient[0]), "calculate_gradient weights values are incorrect"
 
-  assert np.isclose(actual_gradient[1], expected_gradient[1]), "calculate_gradient bias values is incorrect"
+  assert np.isclose(actual_gradient[1], expected_gradient[1]), "calculate_gradient bias values are incorrect"
   
   print("All tests passed!")
 
 
 if __name__ == '__main__':
-  X, Y = read_the_data_set()
-
   # make sure the tests pass before running gradient descent
   run_tests()
+
+  X, Y = read_the_data_set()
 
   # we can randomly initialize to try different values
   # W = np.random.rand(1, X.shape[0])

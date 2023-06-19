@@ -35,7 +35,7 @@ def sigmoid(Z):
 # returns the total loss with regard to all samples, float
 def calculate_loss(Y_hat, Y):
   # YOUR CODE HERE #
-  loss = -np.mean(Y * np.log(Y_hat) + (1 - Y) * np.log(1 - Y_hat))
+  loss = np.mean(-(1 - Y) * np.log(1 - Y_hat) - Y * np.log(Y_hat))
   return loss
 
 
@@ -207,18 +207,18 @@ def run_tests():
 
   assert actual_gradient[0].shape == expected_gradient[0].shape, "calculate_gradient weights shape is incorrect"
 
-  assert np.allclose(actual_gradient[0], expected_gradient[0]), "calculate_gradient weights values is incorrect"
+  assert np.allclose(actual_gradient[0], expected_gradient[0]), "calculate_gradient weights values are incorrect"
 
-  assert np.isclose(actual_gradient[1], expected_gradient[1]), "calculate_gradient bias values is incorrect"
+  assert np.isclose(actual_gradient[1], expected_gradient[1]), "calculate_gradient bias values are incorrect"
   
   print("All tests passed!")
 
 
 if __name__ == '__main__':
-  X, Y = read_the_data_set()
-
   # make sure the tests pass before running gradient descent
   run_tests()
+
+  X, Y = read_the_data_set()
 
   # we can randomly initialize to try different values
   # W = np.random.rand(1, X.shape[0])

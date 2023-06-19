@@ -25,8 +25,7 @@ def evaluate_model(w, b, X):
 # returns the total loss with regard to all samples, float
 def calculate_loss(Y_hat, Y):
   # YOUR CODE HERE #
-  error = Y_hat - Y
-  loss = 0.5 * np.mean(error ** 2)
+  loss = np.mean((Y_hat - Y) ** 2) / 2
   return loss
 
 
@@ -161,10 +160,10 @@ def run_tests():
 
 
 if __name__ == '__main__':
-  X, Y = read_the_data_set()
-
   # make sure the tests pass before running gradient descent
   run_tests()
+
+  X, Y = read_the_data_set()
 
   # we can randomly initialize to try different values
   # w = np.random.rand()
