@@ -72,7 +72,7 @@ def draw_boundry(W, b, boundary_X, axs, boundary_graph, samples):
     for j in range(samples):
       x1, x2 = boundary_X[0,i], boundary_X[0,j]
       X = np.array([x1, x2, x1**2, x1 * x2, x2**2]).reshape(-1, 1)
-      Z[i,j] = evaluate_model_without_activation(W, b, X)
+      Z[j,i] = evaluate_model_without_activation(W, b, X)
   if boundary_graph != None:
     for tp in boundary_graph.collections:
       tp.remove()
@@ -92,10 +92,11 @@ def draw_loss(iteration, loss, iterations_axis, losses_axis, axs, loss_graph):
 def initialize_graphs(W, b, X, Y, boundry_samples):
   min_x = np.amin(X, axis=1)
   max_x = np.amax(X, axis=1)
+  length = max_x - min_x
   
   padding = 0.1
-  min_x_padded = min_x * (1 - padding)
-  max_x_padded = max_x * (1 + padding)
+  min_x_padded = min_x - padding * length
+  max_x_padded = max_x + padding * length
 
   plt.ion()
   fig, axs = plt.subplots(1, 2)
@@ -152,6 +153,10 @@ def run_gradient_descent(X, Y, initial_W, initial_b, learning_rate, iterations):
       boundary_graph = draw_boundry(W, b, boundary_X, axs, boundary_graph, boundry_samples)
 
       draw_loss(iteration, loss, iterations_axis, losses_axis, axs, loss_graph)
+
+      accuracy = np.sum(np.where(Y_hat >= 0.5, 1, 0) == Y) / Y.shape[1]
+
+      print(f"{iteration:{len(str(iterations))}}/{iterations} loss: {loss:0.06f} accuracy: {accuracy:7.2%}")
 
       fig.canvas.draw()
       fig.canvas.flush_events()
