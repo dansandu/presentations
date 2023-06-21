@@ -26,8 +26,8 @@ import pickle
 # these files to be decompressed already.
 def path_to_dataset():
   return {
-    'images': 'C:/Users/Daniel/workspace/datasets/mnist/train-images-idx3-ubyte',
-    'labels': 'C:/Users/Daniel/workspace/datasets/mnist/train-labels-idx1-ubyte'
+    'images': 'path/to/images',
+    'labels': 'path/to/labels',
   }
 
 
@@ -146,7 +146,9 @@ def backpropagation(Ws, X, As, Y, weight_decay):
 
 
 def read_the_data_set(image_count):
-  images_path, labels_path = path_to_dataset()
+  paths = path_to_dataset()
+  images_path = paths['images']
+  labels_path = paths['labels']
 
   with open(images_path, 'rb') as f:
     # skip header
