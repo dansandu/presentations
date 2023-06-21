@@ -250,7 +250,7 @@ def run_gradient_descent(X, Y, initial_Ws, initial_Bs, batch_size, epochs, learn
     fig.canvas.flush_events()
 
   if accuracy != None:
-    model_path = f"../models/digit_recognition_{accuracy:.2}.pickle"
+    model_path = f"../models/digit_recognition_{accuracy * 100:.4}.pickle"
     with open(model_path, 'wb') as f:
       data = {"weights": Ws, "biases": Bs}
       pickle.dump(data, f)
