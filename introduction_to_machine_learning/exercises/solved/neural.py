@@ -79,8 +79,8 @@ def backpropagation(Ws, Bs, X, Zs, Y):
   
   for i in reversed(range(layers)):
     Ap = sigmoid(Zs[i-1]) if i > 0 else X
-
-    dloss_dW = dloss_dZ @ Ap.T
+    dZ_dW = Ap.T
+    dloss_dW = dloss_dZ @ dZ_dW
     dloss_dB = np.sum(dloss_dZ, axis=1, keepdims=True)
 
     dloss_dWs[i] = dloss_dW
