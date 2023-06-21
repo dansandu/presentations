@@ -81,7 +81,7 @@ epochs = 25
 # You can always get a fresh copy of this file so don't worry if you break something. #
 #######################################################################################
 
-
+image_count = 60000
 image_width = 28
 image_height = 28
 
@@ -145,7 +145,7 @@ def backpropagation(Ws, X, As, Y, weight_decay):
   return dloss_dWs, dloss_dBs
 
 
-def read_the_data_set(image_count):
+def read_the_data_set():
   paths = path_to_dataset()
   images_path = paths['images']
   labels_path = paths['labels']
@@ -193,7 +193,7 @@ def normalize(X):
   return (X - 0.5 * 255) / (0.5 * 255)
 
 
-def run_gradient_descent(X, Y, initial_Ws, initial_Bs, batch_size, epochs, learning_rate, weight_decay, momentum):
+def run_gradient_descent(X, Y, initial_Ws, initial_Bs, training_count, batch_size, epochs, learning_rate, weight_decay, momentum):
   Xn = normalize(X)
 
   Ws = initial_Ws
@@ -208,14 +208,13 @@ def run_gradient_descent(X, Y, initial_Ws, initial_Bs, batch_size, epochs, learn
 
   fig, axs, loss_graph = initialize_graphs(X, Y)
 
-  total_samples = Xn.shape[1]
-  batches = total_samples // batch_size + (1 if total_samples % batch_size != 0 else 0)
+  batches = training_count // batch_size + (1 if training_count % batch_size != 0 else 0)
   
   for epoch_index in range(epochs):
     batch_losses = []
     for batch_index in range(batches):
       batch_begin = batch_index * batch_size
-      batch_end = min(batch_begin + batch_size, total_samples)
+      batch_end = min(batch_begin + batch_size, training_count)
 
       batch_X = Xn[:,batch_begin:batch_end]
       batch_Y = Y[:,batch_begin:batch_end]
@@ -239,10 +238,11 @@ def run_gradient_descent(X, Y, initial_Ws, initial_Bs, batch_size, epochs, learn
     losses.append(np.mean(batch_losses))
     draw_loss(iterations, losses, axs, loss_graph)
 
-    total_As = forward_propagation(Ws, Bs, Xn)
-    total_Y_hat = total_As[-1]
+    testing_Y = Y[:,training_count:]
+    testing_As = forward_propagation(Ws, Bs, Xn[:,training_count:])
+    testing_Y_hat = testing_As[-1]
 
-    accuracy = np.sum(np.argmax(total_Y_hat, axis=0) == np.argmax(Y, axis=0)) / total_samples
+    accuracy = np.sum(np.argmax(testing_Y_hat, axis=0) == np.argmax(testing_Y, axis=0)) / testing_Y.shape[1]
 
     print(f"epoch: {epoch_index+1:{len(str(epochs))}}/{epochs} loss: {losses[-1]:0.06f} accuracy: {accuracy:7.2%}")
 
@@ -286,14 +286,14 @@ if __name__ == "__main__":
     plt.show()
 
   elif image_path == None and model_path == None:
-    image_count = 50000
+    training_count = 50000
     batch_size = 100
 
-    X, Y = read_the_data_set(image_count)
+    X, Y = read_the_data_set()
 
     Ws, Bs = neural_network_model()
 
-    run_gradient_descent(X, Y, Ws, Bs, batch_size, epochs, learning_rate, weight_decay, momentum)
+    run_gradient_descent(X, Y, Ws, Bs, training_count, batch_size, epochs, learning_rate, weight_decay, momentum)
 
     print("Press enter to exit...", end='')
     input()
