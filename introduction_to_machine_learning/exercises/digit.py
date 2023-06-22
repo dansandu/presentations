@@ -81,6 +81,7 @@ epochs = 25
 # You can always get a fresh copy of this file so don't worry if you break something. #
 #######################################################################################
 
+
 image_count = 60000
 image_width = 28
 image_height = 28
@@ -131,7 +132,8 @@ def backpropagation(Ws, X, As, Y, weight_decay):
   for i in reversed(range(layers)):
     Ap = As[i-1] if i > 0 else X
 
-    dloss_dW = dloss_dZ @ Ap.T + weight_decay * Ws[i]
+    dZ_dW = Ap.T
+    dloss_dW = dloss_dZ @ dZ_dW + weight_decay * Ws[i]
     dloss_dB = np.sum(dloss_dZ, axis=1, keepdims=True)
 
     dloss_dWs[i] = dloss_dW
@@ -178,7 +180,7 @@ def initialize_graphs(images, labels):
   fig, axs = plt.subplots(1, 2)
 
   image_index = np.random.randint(0, images.shape[1])
-  image = np.asarray(images[:,image_index].reshape(image_width, image_height, 1)).squeeze()
+  image = images[:,image_index].reshape(image_width, image_height)
   axs[0].set_title(f"Sample #{image_index} Label: {np.argmax(labels[:,image_index])}")
   axs[0].imshow(image)
 
@@ -244,13 +246,13 @@ def run_gradient_descent(X, Y, initial_Ws, initial_Bs, training_count, batch_siz
 
     accuracy = np.sum(np.argmax(testing_Y_hat, axis=0) == np.argmax(testing_Y, axis=0)) / testing_Y.shape[1]
 
-    print(f"epoch: {epoch_index+1:{len(str(epochs))}}/{epochs} loss: {losses[-1]:0.06f} accuracy: {accuracy:7.2%}")
+    print(f"epoch: {epoch_index+1:{len(str(epochs))}}/{epochs} loss: {losses[-1]:.6f} accuracy: {accuracy:7.2%}")
 
     fig.canvas.draw()
     fig.canvas.flush_events()
 
   if accuracy != None:
-    model_path = f"../models/digit_recognition_{accuracy * 100:.4}.pickle"
+    model_path = f"../models/digit_recognition_{accuracy * 100:.2f}.pickle"
     with open(model_path, 'wb') as f:
       data = {"weights": Ws, "biases": Bs}
       pickle.dump(data, f)
