@@ -26,8 +26,10 @@ import pickle
 # these files to be decompressed already.
 def path_to_dataset():
   return {
-    'images': 'path/to/images',
-    'labels': 'path/to/labels',
+    'train_images': 'path/to/train/images',
+    'train_labels': 'path/to/train/labels',
+    'test_images': 'path/to/test/images',
+    'test_labels': 'path/to/test/labels',
   }
 
 
@@ -40,12 +42,12 @@ def path_to_dataset():
 #         nj is the number of neurons for the layer i - 1
 def neural_network_model():
   Ws = [
-    np.random.rand(50, 784),
-    np.random.rand(10, 50),
+    np.random.rand(200, 784),
+    np.random.rand(10, 200),
   ]
 
   Bs = [
-    np.random.rand(50, 1),
+    np.random.rand(200, 1),
     np.random.rand(10, 1),
   ]
   return Ws, Bs
@@ -58,22 +60,22 @@ def neural_network_model():
 
 # The learning rate should be low enough otherwise the algorithm will not converge but increasing the 
 # learning rate can increase the convergence speed.
-learning_rate = 0.1
+learning_rate = 0.001
 
 
 # The weight decay is a regularization technique which tries to reduce the magnitude of the weight 
 # parameters and thus helps the model to generalize better.
-weight_decay = 0.01
+weight_decay = 0.0001
 
 
 # The momentum is an increase to the parameters update with regard to the previous update step.
 # A part of the previous gradient is transfered to each weight and bias update.
-momentum = 0.9
+momentum = 0.99
 
 
 # The number of iterations used to train the model.
 # Each epoch passes once through the entire training set.
-epochs = 25
+epochs = 2000
 
 
 #######################################################################################
@@ -82,9 +84,11 @@ epochs = 25
 #######################################################################################
 
 
-image_count = 60000
+train_image_count = 60000
+test_image_count = 10000
 image_width = 28
 image_height = 28
+batch_size = 100
 
 
 def sigmoid(Z):
@@ -147,16 +151,12 @@ def backpropagation(Ws, X, As, Y, weight_decay):
   return dloss_dWs, dloss_dBs
 
 
-def read_the_data_set():
-  paths = path_to_dataset()
-  images_path = paths['images']
-  labels_path = paths['labels']
-
+def read_the_data_set(images_path, labels_path, image_count):
   with open(images_path, 'rb') as f:
     # skip header
     f.read(16)
     raw_data = f.read(image_count * image_width * image_height)
-    images = np.frombuffer(raw_data, dtype=np.uint8).astype(np.float32).reshape(image_count, image_width * image_height).T
+    X = np.frombuffer(raw_data, dtype=np.uint8).astype(np.float32).reshape(image_count, image_width * image_height).T
 
   with open(labels_path, 'rb') as f:
     # skip header
@@ -165,7 +165,7 @@ def read_the_data_set():
     labels = np.frombuffer(raw_data, dtype=np.uint8)
     Y = np.eye(10)[labels].T
 
-  return images, Y
+  return X, Y
 
 
 def draw_loss(iterations, losses, axs, loss_graph):
@@ -195,8 +195,12 @@ def normalize(X):
   return (X - 0.5 * 255) / (0.5 * 255)
 
 
-def run_gradient_descent(X, Y, initial_Ws, initial_Bs, training_count, batch_size, epochs, learning_rate, weight_decay, momentum):
-  Xn = normalize(X)
+def run_gradient_descent(train_X, train_Y, test_X, test_Y, initial_Ws, initial_Bs, batch_size, epochs, learning_rate, weight_decay, momentum):
+  train_Xn = normalize(train_X)
+  test_Xn  = normalize(test_X)
+
+  train_m = train_X.shape[1]
+  test_m  = test_X.shape[1]
 
   Ws = initial_Ws
   Bs = initial_Bs
@@ -208,18 +212,18 @@ def run_gradient_descent(X, Y, initial_Ws, initial_Bs, training_count, batch_siz
   iterations = []
   accuracy = None
 
-  fig, axs, loss_graph = initialize_graphs(X, Y)
+  fig, axs, loss_graph = initialize_graphs(train_Xn, train_Y)
 
-  batches = training_count // batch_size + (1 if training_count % batch_size != 0 else 0)
+  batches = train_m // batch_size + (1 if train_m % batch_size != 0 else 0)
   
   for epoch_index in range(epochs):
     batch_losses = []
     for batch_index in range(batches):
       batch_begin = batch_index * batch_size
-      batch_end = min(batch_begin + batch_size, training_count)
+      batch_end = min(batch_begin + batch_size, train_m)
 
-      batch_X = Xn[:,batch_begin:batch_end]
-      batch_Y = Y[:,batch_begin:batch_end]
+      batch_X = train_Xn[:,batch_begin:batch_end]
+      batch_Y = train_Y[:,batch_begin:batch_end]
 
       batch_As = forward_propagation(Ws, Bs, batch_X)
 
@@ -240,12 +244,9 @@ def run_gradient_descent(X, Y, initial_Ws, initial_Bs, training_count, batch_siz
     losses.append(np.mean(batch_losses))
     draw_loss(iterations, losses, axs, loss_graph)
 
-    testing_Y = Y[:,training_count:]
-    testing_As = forward_propagation(Ws, Bs, Xn[:,training_count:])
-    testing_Y_hat = testing_As[-1]
-
-    accuracy = np.sum(np.argmax(testing_Y_hat, axis=0) == np.argmax(testing_Y, axis=0)) / testing_Y.shape[1]
-
+    test_As = forward_propagation(Ws, Bs, test_Xn)
+    test_Y_hat = test_As[-1]
+    accuracy = np.sum(np.argmax(test_Y_hat, axis=0) == np.argmax(test_Y, axis=0)) / test_m
     print(f"epoch: {epoch_index+1:{len(str(epochs))}}/{epochs} loss: {losses[-1]:.6f} accuracy: {accuracy:7.2%}")
 
     fig.canvas.draw()
@@ -254,7 +255,15 @@ def run_gradient_descent(X, Y, initial_Ws, initial_Bs, training_count, batch_siz
   if accuracy != None:
     model_path = f"../models/digit_recognition_{accuracy * 100:.2f}.pickle"
     with open(model_path, 'wb') as f:
-      data = {"weights": Ws, "biases": Bs}
+      data = {
+        "weights": Ws, 
+        "biases": Bs,
+        "batch_size": batch_size,
+        "epochs": epochs,
+        "learning_rate": learning_rate,
+        "weight_decay": weight_decay,
+        "momentum": momentum,
+      }
       pickle.dump(data, f)
 
 
@@ -274,6 +283,14 @@ if __name__ == "__main__":
     Ws = data['weights']
     Bs = data['biases']
 
+    hyperparameters = {k: v for k, v in data.items() if k not in ['weights', 'biases']}
+    hyperparameters['weights_shapes'] = [W.shape for W in Ws]
+    hyperparameters['biases_shapes'] = [B.shape for B in Ws]
+
+    print("Model was trained with the following hyper-parameters:")
+    for k, v in hyperparameters.items():
+      print(f"{k}: {v}")
+
     image = PIL.Image.open(image_path).convert("L").resize((image_width,image_height))
     image = np.array(image.getdata(), dtype=np.uint8).reshape(image_width * image_height, 1)
 
@@ -288,14 +305,15 @@ if __name__ == "__main__":
     plt.show()
 
   elif image_path == None and model_path == None:
-    training_count = 50000
-    batch_size = 100
+    paths = path_to_dataset()
 
-    X, Y = read_the_data_set()
+    train_X, train_Y = read_the_data_set(paths['train_images'], paths['train_labels'], train_image_count)
+
+    test_X, test_Y = read_the_data_set(paths['test_images'], paths['test_labels'], test_image_count)
 
     Ws, Bs = neural_network_model()
 
-    run_gradient_descent(X, Y, Ws, Bs, training_count, batch_size, epochs, learning_rate, weight_decay, momentum)
+    run_gradient_descent(train_X, train_Y, test_X, test_Y, Ws, Bs, batch_size, epochs, learning_rate, weight_decay, momentum)
 
     print("Press enter to exit...", end='')
     input()
