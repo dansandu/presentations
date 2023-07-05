@@ -17,7 +17,7 @@ import pickle
 #   py digit.py                                                                                         #
 #                                                                                                       #
 # To make predictions write a prompt with the arguments below:                                          #
-#   py digit.py --image=path/to/my/digit.png --model=../models/digit_recognition_88.45.pickle           #
+#   py digit.py --image=path/to/my/digit.png --model=../models/digit_recognition_98.14.pickle           #
 #                                                                                                       #
 #########################################################################################################
 
